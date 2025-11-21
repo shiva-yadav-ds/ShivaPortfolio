@@ -35,8 +35,8 @@ const Hero = () => {
               Hi, I'm <span className='text-[#00FFFF]'>Shiva</span>
             </h1>
             <p className={`${styles.heroSubText} mt-2 text-white-100`}>
-              Aspiring Data Scientist <br className='sm:block hidden' />
-              and Problem Solver
+              Data Scientist & Python Developer <br className='sm:block hidden' />
+              from IIT Madras
             </p>
             <div className="mt-8 md:hidden flex justify-start">
               <FloatingConsole />

@@ -47,7 +47,7 @@ const About = () => {
         variants={fadeIn("", "", 0.1, 1)}
         className='mt-4 text-secondary text-[17px] max-w-3xl leading-[30px]'
       >
-   I'm a passionate data science enthusiast with skills in Python, SQL, and expertise in libraries like Pandas, NumPy, and Matplotlib. I excel in data analysis, problem-solving, and building scalable solutions. I’m a quick learner, eager to collaborate on innovative projects that drive real-world impact. Let's work together to turn your ideas into data-driven realities!
+        I am Shiva Yadav, a Data Science student at IIT Madras and a passionate Python Developer. I specialize in building data-driven solutions using Machine Learning, SQL, and Data Analysis. With expertise in libraries like Pandas, NumPy, and Scikit-learn, I transform complex data into actionable insights. Explore my portfolio to see my projects in AI, Web Development, and Statistical Modeling.
       </motion.p>
 
       <div className='mt-20 flex flex-wrap gap-10'>
