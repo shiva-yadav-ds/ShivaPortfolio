@@ -29,6 +29,7 @@ import meta from "./company/meta.png";
 import shopify from "./company/shopify.png";
 import starbucks from "./company/starbucks.png";
 import tesla from "./company/tesla.png";
+import iitm from "./company/iitm.png";
 
 import carrent from "./carrent.png";
 import dignosis from "./Ai_Clinical_Diagnosis.png";
@@ -65,6 +66,7 @@ export {
   shopify,
   starbucks,
   tesla,
+  iitm,
   carrent,
   dignosis,
   iitmhub,

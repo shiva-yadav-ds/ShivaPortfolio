@@ -22,6 +22,7 @@ import {
   carrent,
   dignosis,
   iitmhub,
+  iitm,
   threejs,
 } from "../assets";
 
@@ -119,7 +120,7 @@ const experiences = [
   {
     title: "Foundation Year Student - Data Science",
     company_name: "IIT Madras",
-    icon: "https://seeklogo.com/images/I/iit-madras-logo-0B28C23C92-seeklogo.com.png",
+    icon: iitm,
     iconBg: "#E6DEDD",
     date: "Jan 2025 - Present",
     points: [

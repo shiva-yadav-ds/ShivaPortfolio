@@ -44,7 +44,7 @@ const Hero = () => {
           </motion.div>
         </div>
         
-        <div className="hidden md:flex absolute right-10 lg:right-48 top-24 z-10 pointer-events-auto">
+        <div className="hidden md:flex absolute right-10 lg:right-24 top-24 z-10 pointer-events-auto">
             <FloatingConsole />
         </div>
       </div>
