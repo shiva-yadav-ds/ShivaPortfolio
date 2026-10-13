@@ -41,9 +41,11 @@ function Project({ project, index }) {
   const [expanded, setExpanded] = useState(false);
   return (
     <Reveal delay={index * 0.1}>
-      <Spotlight className={`project-card ${project.color}`}>
+      <Spotlight className={`project-card project-showcase ${project.color}`}>
         <a
           className="project-visual"
+          data-cursor="EXPLORE"
+          data-project-number={`0${index + 1}`}
           href={project.url}
           target="_blank"
           rel="noreferrer"
@@ -76,6 +78,11 @@ function Project({ project, index }) {
           </span>
         </a>
         <div className="project-body">
+          <span className="project-kicker">
+            {index === 0
+              ? "BUILT FOR STUDENTS, BY A STUDENT"
+              : "AN EXPLORATION IN APPLIED MACHINE LEARNING"}
+          </span>
           <p className="eyebrow">
             <span>{project.number} /</span> {project.type}
           </p>
@@ -130,7 +137,7 @@ export default function Works() {
           A selection of things I’ve built while exploring the space between
           data and real-world problems.
         </SectionTitle>
-        <div className="projects-grid">
+        <div className="projects-grid project-showcases">
           {projects.map((project, index) => (
             <Project key={project.title} project={project} index={index} />
           ))}

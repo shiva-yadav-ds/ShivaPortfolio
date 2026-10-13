@@ -5,6 +5,17 @@ import { profile } from "../constants/profile";
 export default function Contact() {
   const [form, setForm] = useState({ name: "", email: "", message: "" });
   const [status, setStatus] = useState("idle");
+  const [copyStatus, setCopyStatus] = useState("");
+  async function copyEmail() {
+    try {
+      await navigator.clipboard.writeText(profile.email);
+      setCopyStatus("Email copied!");
+    } catch {
+      setCopyStatus(
+        "Select the email above to copy it, or click it to write to me.",
+      );
+    }
+  }
   const update = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
     if (status !== "sending") setStatus("idle");
@@ -51,6 +62,24 @@ export default function Contact() {
           {profile.email}
           <Arrow diagonal />
         </a>
+        <div className="copy-email-row">
+          <button type="button" className="copy-email" onClick={copyEmail}>
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              aria-hidden="true"
+            >
+              <rect x="8" y="8" width="12" height="12" rx="2" />
+              <path d="M16 8V4H4v12h4" />
+            </svg>
+            Copy email
+          </button>
+          <span aria-live="polite">{copyStatus}</span>
+        </div>
         <div className="contact-socials">
           <a href={profile.linkedin} target="_blank" rel="noreferrer">
             LinkedIn <Arrow diagonal />

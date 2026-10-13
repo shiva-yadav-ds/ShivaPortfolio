@@ -1,11 +1,6 @@
 import React from "react";
-import {
-  MotionConfig,
-  motion,
-  useScroll,
-  useSpring,
-  useReducedMotion,
-} from "framer-motion";
+import { MotionConfig, motion, useScroll, useSpring } from "framer-motion";
+import { useMotionPreference as useReducedMotion } from "./hooks/useMotionPreference";
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import About from "./components/About";
@@ -28,8 +23,9 @@ function ScrollProgress() {
   );
 }
 export default function App() {
+  const reduced = useReducedMotion();
   return (
-    <MotionConfig reducedMotion="user">
+    <MotionConfig reducedMotion={reduced ? "always" : "never"}>
       <a className="skip-link" href="#main">
         Skip to content
       </a>

@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from "react";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
+import { useMotionPreference as useReducedMotion } from "../hooks/useMotionPreference";
 
 export function Arrow({ diagonal = false, ...props }) {
   return (
@@ -85,6 +86,9 @@ export function Cursor() {
         "interactive",
         Boolean(e.target.closest("a, button, input, textarea")),
       );
+      const label = e.target.closest("[data-cursor]")?.dataset.cursor;
+      cursor.classList.toggle("has-label", Boolean(label));
+      cursor.querySelector("b").textContent = label || "";
     };
     const hide = () => cursor.classList.remove("visible");
     window.addEventListener("pointermove", move, { passive: true });
@@ -99,6 +103,7 @@ export function Cursor() {
   return (
     <div className="cursor" ref={ref} aria-hidden="true">
       <span />
+      <b />
     </div>
   );
 }
