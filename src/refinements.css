@@ -702,3 +702,46 @@
     transform: none;
   }
 }
+
+/* Scroll reveals use one shared observer; critical hero content paints immediately. */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition:
+    opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: var(--reveal-delay, 0s);
+}
+.reveal.revealed {
+  opacity: 1;
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+@media (pointer: coarse) {
+  .lab-pause {
+    width: 44px;
+    height: 44px;
+  }
+  .lab-controls button {
+    min-height: 44px;
+  }
+  .project-links a,
+  .contact-socials a {
+    min-height: 44px;
+  }
+  .copy-email {
+    min-height: 44px;
+  }
+  .site-footer > div > a {
+    min-height: 44px;
+  }
+  .site-footer .back-top {
+    min-width: 44px;
+  }
+}

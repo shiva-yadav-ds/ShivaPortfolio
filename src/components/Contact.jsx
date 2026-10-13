@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import emailjs from "@emailjs/browser";
 import { Reveal, Arrow, Spotlight } from "./UI";
 import { profile } from "../constants/profile";
 export default function Contact() {
@@ -25,6 +24,7 @@ export default function Contact() {
     if (status === "sending") return;
     setStatus("sending");
     try {
+      const { default: emailjs } = await import("@emailjs/browser");
       await emailjs.send(
         "service_jpcmyr8",
         "template_gkelals",

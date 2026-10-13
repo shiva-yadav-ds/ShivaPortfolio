@@ -8,7 +8,7 @@
 
     <!-- Title and Favicon -->
     <title>Shiva Yadav | Data Scientist Portfolio</title>
-    <link rel="icon" type="image/png" href="/logo.png" />
+    <link rel="icon" type="image/png" href="/src/assets/favicon.png" />
 
     <!-- SEO Metadata -->
     <meta
@@ -77,13 +77,28 @@
     <!-- Canonical URL -->
     <link rel="canonical" href="https://shiva-yadav-ds.vercel.app/" />
 
-    <!-- Preloading Critical Resources -->
-    <!-- Preloading Critical Resources -->
-    <!-- <link rel="preload" href="/path/to/logo.png" as="image" /> -->
-
-    <!-- Font and Icons -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Self-hosted fonts: discovered before the JavaScript application starts. -->
+    <link
+      rel="preload"
+      href="/src/assets/fonts/dm-sans-latin.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="/src/assets/fonts/space-grotesk-latin.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="/src/assets/fonts/dm-serif-display-italic-latin.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
   </head>
 
   <body>

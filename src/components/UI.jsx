@@ -1,5 +1,4 @@
 import React, { useEffect, useRef } from "react";
-import { motion } from "framer-motion";
 import { useMotionPreference as useReducedMotion } from "../hooks/useMotionPreference";
 
 export function Arrow({ diagonal = false, ...props }) {
@@ -22,19 +21,84 @@ export function Arrow({ diagonal = false, ...props }) {
     </svg>
   );
 }
-export function Reveal({ children, className = "", delay = 0, ...props }) {
+let revealObserver;
+function getRevealObserver() {
+  if (!revealObserver) {
+    revealObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach(({ target, isIntersecting }) => {
+          if (isIntersecting) {
+            target.classList.add("revealed");
+            revealObserver.unobserve(target);
+          }
+        });
+      },
+      { rootMargin: "0px 0px -24px 0px", threshold: 0.05 },
+    );
+  }
+  return revealObserver;
+}
+export function Reveal({
+  children,
+  className = "",
+  delay = 0,
+  eager = false,
+  ...props
+}) {
+  const ref = useRef(null);
   const reduced = useReducedMotion();
+  useEffect(() => {
+    const node = ref.current;
+    if (eager || reduced || !("IntersectionObserver" in window)) {
+      node.classList.add("revealed");
+      return;
+    }
+    const observer = getRevealObserver();
+    observer.observe(node);
+    return () => observer.unobserve(node);
+  }, [eager, reduced]);
   return (
-    <motion.div
-      className={className}
-      initial={reduced ? false : { opacity: 0, y: 28 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.12 }}
-      transition={{ duration: 0.7, delay, ease: [0.22, 1, 0.36, 1] }}
+    <div
+      ref={ref}
+      className={`${className} reveal${eager || reduced ? " revealed" : ""}`}
+      style={{ "--reveal-delay": `${delay}s` }}
       {...props}
     >
       {children}
-    </motion.div>
+    </div>
+  );
+}
+export function ScrollProgress() {
+  const ref = useRef(null);
+  useEffect(() => {
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      const height = document.documentElement.scrollHeight - window.innerHeight;
+      ref.current.style.transform = `scaleX(${height > 0 ? Math.min(1, window.scrollY / height) : 0})`;
+    };
+    const schedule = () => {
+      if (!frame) frame = requestAnimationFrame(update);
+    };
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
+    const observer = new ResizeObserver(schedule);
+    observer.observe(document.body);
+    update();
+    return () => {
+      cancelAnimationFrame(frame);
+      observer.disconnect();
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
+    };
+  }, []);
+  return (
+    <div
+      ref={ref}
+      className="scroll-progress"
+      style={{ transform: "scaleX(0)" }}
+      aria-hidden="true"
+    />
   );
 }
 export function SectionTitle({ number, label, title, accent, children }) {

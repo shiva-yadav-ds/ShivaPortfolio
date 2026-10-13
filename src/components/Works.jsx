@@ -1,7 +1,11 @@
 import React, { useState } from "react";
 import { Reveal, SectionTitle, Arrow, Spotlight } from "./UI";
-import scholar from "../assets/projects/scholar-hub.png";
-import clinical from "../assets/Ai_Clinical_Diagnosis.png";
+import scholar from "../assets/projects/scholar-hub-960.webp";
+import scholarSmall from "../assets/projects/scholar-hub-480.webp";
+import scholarLarge from "../assets/projects/scholar-hub-1440.webp";
+import clinical from "../assets/projects/clinical-suite-960.webp";
+import clinicalSmall from "../assets/projects/clinical-suite-480.webp";
+import clinicalLarge from "../assets/projects/clinical-suite-1440.webp";
 import { profile } from "../constants/profile";
 const projects = [
   {
@@ -12,6 +16,9 @@ const projects = [
       "Less searching. More doing. A student toolkit that brings grade calculations, end-term predictions, and study resources into one thoughtful experience.",
     tags: ["React", "TypeScript", "Student experience"],
     image: scholar,
+    imageSet: `${scholarSmall} 480w, ${scholar} 960w, ${scholarLarge} 1440w`,
+    width: 1851,
+    height: 966,
     url: "https://iitm-scholar-hub.vercel.app/",
     source: profile.github,
     sourceLabel: "GitHub profile",
@@ -28,6 +35,9 @@ const projects = [
       "Exploring how machine learning can make complex health data easier to understand, with an interactive interface for disease prediction and assessment.",
     tags: ["Python", "Scikit-learn", "Streamlit"],
     image: clinical,
+    imageSet: `${clinicalSmall} 480w, ${clinical} 960w, ${clinicalLarge} 1354w`,
+    width: 1354,
+    height: 876,
     url: "https://clinical-ai-diagnostic-suite.streamlit.app/",
     source: "https://github.com/shiva-yadav-ds/Prediction-of-Disease-Outbreaks",
     sourceLabel: "Source code",
@@ -67,10 +77,13 @@ function Project({ project, index }) {
             </div>
             <img
               src={project.image}
+              srcSet={project.imageSet}
+              sizes="(max-width: 600px) 90vw, (max-width: 1400px) 50vw, 680px"
+              decoding="async"
               alt={`${project.title} application preview`}
               loading="lazy"
-              width="1851"
-              height="966"
+              width={project.width}
+              height={project.height}
             />
           </div>
           <span className="preview-hint">

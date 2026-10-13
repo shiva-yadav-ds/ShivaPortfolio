@@ -1,6 +1,4 @@
 import React from "react";
-import { MotionConfig, motion, useScroll, useSpring } from "framer-motion";
-import { useMotionPreference as useReducedMotion } from "./hooks/useMotionPreference";
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import About from "./components/About";
@@ -9,23 +7,10 @@ import Tech from "./components/Tech";
 import Experience from "./components/Experience";
 import Contact from "./components/Contact";
 import Footer from "./components/Footer";
-import { Cursor } from "./components/UI";
-function ScrollProgress() {
-  const { scrollYProgress } = useScroll();
-  const smooth = useSpring(scrollYProgress, { stiffness: 140, damping: 30 });
-  const reduced = useReducedMotion();
-  return (
-    <motion.div
-      className="scroll-progress"
-      style={{ scaleX: reduced ? scrollYProgress : smooth }}
-      aria-hidden="true"
-    />
-  );
-}
+import { Cursor, ScrollProgress } from "./components/UI";
 export default function App() {
-  const reduced = useReducedMotion();
   return (
-    <MotionConfig reducedMotion={reduced ? "always" : "never"}>
+    <>
       <a className="skip-link" href="#main">
         Skip to content
       </a>
@@ -53,6 +38,6 @@ export default function App() {
         <Contact />
       </main>
       <Footer />
-    </MotionConfig>
+    </>
   );
 }

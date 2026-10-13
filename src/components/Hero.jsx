@@ -7,7 +7,7 @@ export default function Hero() {
   return (
     <section id="home" className="hero container">
       <div className="hero-copy">
-        <Reveal>
+        <Reveal eager>
           <p className="availability">
             <span className="tiny-dot" /> DATA SCIENCE STUDENT AT IIT MADRAS
           </p>
@@ -49,7 +49,7 @@ export default function Hero() {
           </div>
         </Reveal>
       </div>
-      <Reveal className="hero-visual" delay={0.15}>
+      <Reveal className="hero-visual" eager>
         <DataLab />
       </Reveal>
       <div className="hero-bottom">

@@ -24,33 +24,41 @@ const modes = [
     color: "#e8c99a",
   },
 ];
-const count = 192;
 // Deterministic geometry: this is an illustrative sketch, not a live dataset.
-const shapes = [0, 1, 2].map((mode) =>
-  Array.from({ length: count }, (_, i) => {
-    const a = i * Math.PI * (3 - Math.sqrt(5));
-    const y = 1 - (i / (count - 1)) * 2;
-    const r = Math.sqrt(1 - y * y);
-    if (mode === 0)
-      return { x: Math.cos(a) * r * 162, y: y * 162, z: Math.sin(a) * r * 162 };
-    if (mode === 1) {
-      const layer = Math.floor(i / 32),
-        angle = ((i % 32) / 32) * Math.PI * 2;
+function createShapes(count) {
+  const ringSize = count / 6;
+  return [0, 1, 2].map((mode) =>
+    Array.from({ length: count }, (_, i) => {
+      const a = i * Math.PI * (3 - Math.sqrt(5));
+      const y = 1 - (i / (count - 1)) * 2;
+      const r = Math.sqrt(1 - y * y);
+      if (mode === 0)
+        return {
+          x: Math.cos(a) * r * 162,
+          y: y * 162,
+          z: Math.sin(a) * r * 162,
+        };
+      if (mode === 1) {
+        const layer = Math.floor(i / ringSize),
+          angle = ((i % ringSize) / ringSize) * Math.PI * 2;
+        return {
+          x: (layer - 2.5) * 57,
+          y: Math.cos(angle) * 100,
+          z: Math.sin(angle) * 100,
+        };
+      }
+      const u = ((i % ringSize) / ringSize) * Math.PI * 2,
+        v = (Math.floor(i / ringSize) / 6) * Math.PI * 2;
       return {
-        x: (layer - 2.5) * 57,
-        y: Math.cos(angle) * 100,
-        z: Math.sin(angle) * 100,
+        x: (119 + 48 * Math.cos(v)) * Math.cos(u),
+        y: (119 + 48 * Math.cos(v)) * Math.sin(u),
+        z: 48 * Math.sin(v),
       };
-    }
-    const u = ((i % 32) / 32) * Math.PI * 2,
-      v = (Math.floor(i / 32) / 6) * Math.PI * 2;
-    return {
-      x: (119 + 48 * Math.cos(v)) * Math.cos(u),
-      y: (119 + 48 * Math.cos(v)) * Math.sin(u),
-      z: 48 * Math.sin(v),
-    };
-  }),
-);
+    }),
+  );
+}
+const fullShapes = createShapes(192);
+const compactShapes = createShapes(96);
 
 function ParticleCanvas({ mode, paused }) {
   const canvasRef = useRef(null);
@@ -71,20 +79,39 @@ function ParticleCanvas({ mode, paused }) {
     const canvas = canvasRef.current,
       context = canvas.getContext("2d");
     if (!context) return;
+    const compact =
+      window.matchMedia("(pointer: coarse), (max-width: 600px)").matches ||
+      (navigator.hardwareConcurrency || 8) <= 4;
+    const shapes = compact ? compactShapes : fullShapes;
+    const count = shapes[0].length;
+    const ringSize = count / 6;
+    const frameInterval = 1000 / (compact ? 30 : 45);
     let frame = 0,
       width = 1,
       height = 1,
-      visible = true,
+      visible = false,
       previous = 0,
       rotation = 0.38;
     const pointer = { x: 0, y: 0 },
       smoothPointer = { x: 0, y: 0 };
     const points = shapes[modeRef.current].map((p) => ({ ...p }));
+    const projected = points.map((_, i) => ({
+      x: 0,
+      y: 0,
+      depth: 0,
+      perspective: 1,
+      i,
+    }));
+    const drawOrder = projected.slice();
     const draw = (time) => {
       frame = 0;
+      const staticFrame = reduced || pausedRef.current;
+      if (!staticFrame && previous && time - previous < frameInterval - 1) {
+        if (visible && !document.hidden) frame = requestAnimationFrame(draw);
+        return;
+      }
       const delta = previous ? Math.min(time - previous, 40) : 16;
       previous = time;
-      const staticFrame = reduced || pausedRef.current;
       if (!staticFrame) rotation += delta * 0.00009;
       const blend = staticFrame ? 1 : 1 - Math.exp(-delta * 0.005);
       smoothPointer.x += (pointer.x - smoothPointer.x) * 0.045;
@@ -93,23 +120,25 @@ function ParticleCanvas({ mode, paused }) {
       const scale = Math.min(width, height) / 450;
       const angle = rotation + (staticFrame ? 0 : smoothPointer.x * 0.25);
       const tilt = -0.28 + (staticFrame ? 0 : smoothPointer.y * 0.2);
-      const projected = points.map((p, i) => {
+      const cosAngle = Math.cos(angle),
+        sinAngle = Math.sin(angle),
+        cosTilt = Math.cos(tilt),
+        sinTilt = Math.sin(tilt);
+      points.forEach((p, i) => {
         const target = shapes[modeRef.current][i];
         p.x += (target.x - p.x) * blend;
         p.y += (target.y - p.y) * blend;
         p.z += (target.z - p.z) * blend;
-        const x = p.x * Math.cos(angle) - p.z * Math.sin(angle);
-        const z = p.x * Math.sin(angle) + p.z * Math.cos(angle);
-        const y = p.y * Math.cos(tilt) - z * Math.sin(tilt);
-        const depth = p.y * Math.sin(tilt) + z * Math.cos(tilt);
+        const x = p.x * cosAngle - p.z * sinAngle;
+        const z = p.x * sinAngle + p.z * cosAngle;
+        const y = p.y * cosTilt - z * sinTilt;
+        const depth = p.y * sinTilt + z * cosTilt;
         const perspective = 600 / (600 + depth);
-        return {
-          x: width / 2 + x * scale * perspective,
-          y: height / 2 + y * scale * perspective,
-          depth,
-          perspective,
-          i,
-        };
+        const point = projected[i];
+        point.x = width / 2 + x * scale * perspective;
+        point.y = height / 2 + y * scale * perspective;
+        point.depth = depth;
+        point.perspective = perspective;
       });
       const color = modes[modeRef.current].color;
       context.strokeStyle = color;
@@ -117,8 +146,11 @@ function ParticleCanvas({ mode, paused }) {
         projected.forEach((p, i) => {
           const neighbors =
             modeRef.current === 1
-              ? [i + 1, i + 32]
-              : [Math.floor(i / 32) * 32 + ((i + 1) % 32), (i + 32) % count];
+              ? [i + 1, i + ringSize]
+              : [
+                  Math.floor(i / ringSize) * ringSize + ((i + 1) % ringSize),
+                  (i + ringSize) % count,
+                ];
           neighbors.forEach((n) => {
             if (n >= count) return;
             const q = projected[n];
@@ -134,7 +166,7 @@ function ParticleCanvas({ mode, paused }) {
           });
         });
       }
-      projected
+      drawOrder
         .sort((a, b) => b.depth - a.depth)
         .forEach((p) => {
           const alpha = Math.max(0.2, Math.min(1, 0.64 - p.depth / 460));
@@ -171,7 +203,7 @@ function ParticleCanvas({ mode, paused }) {
       const rect = canvas.getBoundingClientRect();
       width = rect.width;
       height = rect.height;
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const dpr = Math.min(window.devicePixelRatio || 1, compact ? 1.5 : 2);
       canvas.width = Math.round(width * dpr);
       canvas.height = Math.round(height * dpr);
       context.setTransform(dpr, 0, 0, dpr, 0, 0);
