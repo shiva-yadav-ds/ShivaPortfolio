@@ -1,126 +1,88 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-
-import { styles } from "../styles";
-import { navLinks } from "../constants";
-import { logo, menu, close } from "../assets";
-
-const Navbar = () => {
+import { Arrow } from "./UI";
+import resume from "../assets/Resume.pdf";
+const links = [
+  ["about", "About"],
+  ["projects", "Projects"],
+  ["expertise", "Expertise"],
+  ["work", "Journey"],
+];
+export default function Navbar() {
+  const [open, setOpen] = useState(false);
   const [active, setActive] = useState("");
-  const [toggle, setToggle] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
-
   useEffect(() => {
-    const handleScroll = () => {
-      const scrollTop = window.scrollY;
-      if (scrollTop > 100) {
-        setScrolled(true);
-      } else {
-        setScrolled(false);
-      }
+    const observer = new IntersectionObserver(
+      (entries) =>
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) setActive(entry.target.id);
+        }),
+      { rootMargin: "-20% 0px -55% 0px" },
+    );
+    document
+      .querySelectorAll("main section[id]")
+      .forEach((section) => observer.observe(section));
+    const close = (e) => {
+      if (e.key === "Escape") setOpen(false);
     };
-
-    window.addEventListener("scroll", handleScroll);
-
-    return () => window.removeEventListener("scroll", handleScroll);
+    window.addEventListener("keydown", close);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("keydown", close);
+    };
   }, []);
-
   return (
-    <nav
-      className={`${
-        styles.paddingX
-      } w-full flex items-center py-5 fixed top-0 z-20 ${
-        scrolled ? "bg-primary" : "bg-transparent"
-      }`}
-    >
-      <div className="w-full flex justify-between items-center max-w-7xl mx-auto">
-        {/* Logo Section */}
-        <Link
-          to="/"
-          className="flex items-center gap-2"
-          onClick={() => {
-            setActive("");
-            window.scrollTo(0, 0);
-          }}
+    <header className="site-header">
+      <nav className="nav-shell" aria-label="Main navigation">
+        <a
+          className="wordmark"
+          href="#home"
+          onClick={() => setOpen(false)}
+          aria-label="Shiva Yadav home"
         >
-          <img src={logo} alt="logo" className="w-9 h-9 object-contain" />
-          <p className="text-white text-[18px] font-bold cursor-pointer flex ">
-            Shiva &nbsp;
-            <span className="sm:block hidden"> | Data Scientist</span>
-          </p>
-        </Link>
-
-        {/* Navigation Links for Desktop */}
-        <div className="flex items-center">
-          <ul className="list-none hidden sm:flex flex-row gap-10">
-            {navLinks.map((nav) => (
-              <li
-                key={nav.id}
-                className={`${
-                  active === nav.title ? "text-white" : "text-secondary"
-                } hover:text-white text-[18px] font-medium cursor-pointer`}
-                onClick={() => setActive(nav.title)}
-              >
-                <a href={`#${nav.id}`}>{nav.title}</a>
-              </li>
-            ))}
-          </ul>
-            {/* Download CV Button */}
-          <a
-            href="https://docs.google.com/document/d/19Q3MB9tmS6zCOcHZOjqokGPduw_ZTOJFR8Vxq-3WQ_A/edit?usp=sharing"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hidden sm:block ml-6 border border-accent-cyan text-accent-cyan px-4 py-2 rounded-lg hover:bg-accent-cyan hover:text-primary hover:shadow-accent-cyan hover:shadow-[0_0_18px_3px] transition-all font-bold"
-          >
-            Download CV
-          </a>
+          shiva<span>↗</span>
+          <small>PORTFOLIO</small>
+        </a>
+        <div className="desktop-nav">
+          {links.map(([id, title]) => (
+            <a
+              key={id}
+              href={`#${id}`}
+              aria-current={active === id ? "location" : undefined}
+            >
+              {title}
+            </a>
+          ))}
         </div>
-
-        {/* Mobile Menu */}
-        <div className="sm:hidden flex flex-1 justify-end items-center">
-          <img
-            src={toggle ? close : menu}
-            alt="menu"
-            className="w-[28px] h-[28px] object-contain"
-            onClick={() => setToggle(!toggle)}
-          />
-
-          <div
-            className={`${
-              !toggle ? "hidden" : "flex"
-            } p-6 black-gradient absolute top-20 right-0 mx-4 my-2 min-w-[140px] z-10 rounded-xl`}
-          >
-            <ul className="list-none flex justify-end items-start flex-1 flex-col gap-4">
-              {navLinks.map((nav) => (
-                <li
-                  key={nav.id}
-                  className={`font-poppins font-medium cursor-pointer text-[16px] ${
-                    active === nav.title ? "text-white" : "text-secondary"
-                  }`}
-                  onClick={() => {
-                    setToggle(!toggle);
-                    setActive(nav.title);
-                  }}
-                >
-                  <a href={`#${nav.id}`}>{nav.title}</a>
-                </li>
-              ))}
-
-              {/* Download CV Button in Mobile Menu */}
-              <a
-                href="https://docs.google.com/document/d/19Q3MB9tmS6zCOcHZOjqokGPduw_ZTOJFR8Vxq-3WQ_A/edit?usp=sharing"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="border border-accent-cyan text-accent-cyan px-4 py-2 rounded-lg hover:bg-accent-cyan hover:text-primary hover:shadow-accent-cyan hover:shadow-[0_0_18px_3px] transition-all font-bold"
-              >
-                Download CV
+        <a className="nav-contact" href="#contact">
+          Let’s talk <Arrow diagonal />
+        </a>
+        <button
+          className="menu-toggle"
+          aria-label={open ? "Close menu" : "Open menu"}
+          aria-expanded={open}
+          aria-controls="mobile-menu"
+          onClick={() => setOpen(!open)}
+        >
+          {open ? "Close −" : "Menu +"}
+        </button>
+        {open && (
+          <div id="mobile-menu" className="mobile-nav">
+            {[...links, ["contact", "Contact"]].map(([id, title]) => (
+              <a key={id} href={`#${id}`} onClick={() => setOpen(false)}>
+                {title}
+                <Arrow diagonal />
               </a>
-            </ul>
+            ))}
+            <a
+              href={resume}
+              download="Shiva-Yadav-Resume.pdf"
+              onClick={() => setOpen(false)}
+            >
+              Download résumé <Arrow />
+            </a>
           </div>
-        </div>
-      </div>
-    </nav>
+        )}
+      </nav>
+    </header>
   );
-};
-
-export default Navbar;
+}

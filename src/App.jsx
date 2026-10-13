@@ -1,30 +1,62 @@
-import { BrowserRouter } from "react-router-dom";
-
-import { About, Contact, Experience, Feedbacks, Hero, Navbar, Tech, Works, Footer, StarsCanvas, Stats, Background } from "./components";
-
-const App = () => {
+import React from "react";
+import {
+  MotionConfig,
+  motion,
+  useScroll,
+  useSpring,
+  useReducedMotion,
+} from "framer-motion";
+import Navbar from "./components/Navbar";
+import Hero from "./components/Hero";
+import About from "./components/About";
+import Works from "./components/Works";
+import Tech from "./components/Tech";
+import Experience from "./components/Experience";
+import Contact from "./components/Contact";
+import Footer from "./components/Footer";
+import { Cursor } from "./components/UI";
+function ScrollProgress() {
+  const { scrollYProgress } = useScroll();
+  const smooth = useSpring(scrollYProgress, { stiffness: 140, damping: 30 });
+  const reduced = useReducedMotion();
   return (
-    <BrowserRouter>
-      <div className='relative z-0 bg-primary'>
-        <Background />
-        <div className='bg-cover bg-no-repeat bg-center'>
-          <Navbar />
-          <Hero />
-        </div>
-        <About />
-        <Stats />
-        <Experience />
-        <Tech />
-        <Works />
-        <Feedbacks />
-        <div className='relative z-0'>
-          <Contact />
-          <StarsCanvas />
-          <Footer />
-        </div>
-      </div>
-    </BrowserRouter>
+    <motion.div
+      className="scroll-progress"
+      style={{ scaleX: reduced ? scrollYProgress : smooth }}
+      aria-hidden="true"
+    />
   );
 }
-
-export default App;
+export default function App() {
+  return (
+    <MotionConfig reducedMotion="user">
+      <a className="skip-link" href="#main">
+        Skip to content
+      </a>
+      <Cursor />
+      <ScrollProgress />
+      <Navbar />
+      <main id="main">
+        <Hero />
+        <div className="discipline-strip" aria-hidden="true">
+          <div>
+            <span>CURIOUS BY NATURE</span>
+            <i>✳</i>
+            <span>DRIVEN BY DATA</span>
+            <i>✳</i>
+            <span>BUILT WITH PURPOSE</span>
+            <i>✳</i>
+            <span>ALWAYS EXPLORING</span>
+            <i>✳</i>
+          </div>
+        </div>
+        <About />
+        <Works />
+        <Tech />
+        <Experience />
+        <Contact />
+      </main>
+      <Footer />
+    </MotionConfig>
+  );
+}
