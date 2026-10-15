@@ -39,10 +39,17 @@ export default function Contact() {
       );
       setStatus("success");
       setForm({ name: "", email: "", message: "" });
-    } catch {
-      setStatus("error");
+    } catch (error) {
+      // EmailJS returns 412 when its connected mail provider needs to be
+      // re-authorized. Keep the message intact for the email-app fallback.
+      setStatus(error?.status === 412 ? "service-error" : "error");
     }
   }
+  const fallbackEmail = `mailto:${profile.email}?subject=${encodeURIComponent(
+    `Portfolio message from ${form.name.trim() || "a visitor"}`,
+  )}&body=${encodeURIComponent(
+    `${form.message.trim()}\n\nFrom: ${form.name.trim()}\nEmail: ${form.email.trim()}`,
+  )}`;
   return (
     <section id="contact" className="section container contact-section">
       <Reveal className="contact-copy">
@@ -156,11 +163,16 @@ export default function Contact() {
             >
               {status === "success" ? (
                 "Thanks for reaching out! Your message has been sent."
-              ) : status === "error" ? (
-                <>
-                  Your message couldn’t be sent. Please try again or{" "}
-                  <a href={`mailto:${profile.email}`}>email me directly</a>.
-                </>
+              ) : status === "service-error" || status === "error" ? (
+                <div className="form-fallback">
+                  <span>
+                    The online form is temporarily unavailable. Your message is
+                    still here.
+                  </span>
+                  <a className="fallback-link" href={fallbackEmail}>
+                    Open it in your email app <Arrow diagonal />
+                  </a>
+                </div>
               ) : (
                 "Your message goes straight to my inbox."
               )}
